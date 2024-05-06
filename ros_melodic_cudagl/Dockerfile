@@ -3,49 +3,52 @@
 # FROM nvidia/cudagl:10.0-runtime-ubuntu18.04
 FROM nvidia/cudagl:11.3.1-devel-ubuntu18.04
 
-ENV DEBIAN_FRONTEND noninteractive 
+# setup timezone
+RUN echo 'Etc/UTC' > /etc/timezone && \
+    ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+    apt-get update && \
+    apt-get install -q -y --no-install-recommends tzdata && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install packages
-RUN apt-get update && apt-get install -y \
-    locales \
-    lsb-release \
-    mesa-utils \
-    git \
-    subversion \
-    xterm \
-    wget \
-    curl \
-    htop \
-    dbus-x11 \
-    software-properties-common \
-    valgrind 
+# install packages
+RUN apt-get update && apt-get install -q -y --no-install-recommends \
+    dirmngr \
+    gnupg2 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Locale
-RUN locale-gen en_US.UTF-8  
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8
+# setup keys
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-keys 4B63CF8FDE49746E98FA01DDAD19BAB3CBF125EA
+
+# setup sources.list
+RUN echo "deb http://snapshots.ros.org/melodic/final/ubuntu bionic main" > /etc/apt/sources.list.d/ros1-snapshots.list
+
+# setup environment
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+ENV ROS_DISTRO melodic
 
 # Install ROS
-RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+RUN echo "deb http://snapshots.ros.org/melodic/final/ubuntu bionic main" > /etc/apt/sources.list.d/ros1-snapshots.list
+
 RUN apt-get update && apt-get install -y \
-    libpcap-dev \
-    libopenblas-dev \
-    gstreamer1.0-tools libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev \
     ros-melodic-desktop-full \
+    build-essential \
     python-rosdep \
     python-rosinstall \
-    python-rosinstall-generator \
-    python-wstool \
-    build-essential \
-    python-rosdep
+    python-vcstools \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y python-pip
+RUN apt-get install -y python-pip && pip install importlib-metadata
 
 # Configure ROS
 RUN rosdep init && rosdep update 
 RUN echo "source /opt/ros/melodic/setup.bash" >> /root/.bashrc
+
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 COPY ./entrypoint_setup.sh /
 ENTRYPOINT ["/entrypoint_setup.sh"]

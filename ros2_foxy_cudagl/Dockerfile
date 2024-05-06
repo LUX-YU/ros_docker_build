@@ -3,34 +3,40 @@
 # FROM nvidia/cudagl:10.0-runtime-ubuntu18.04
 FROM nvidia/cudagl:11.3.0-devel-ubuntu20.04
 
-ENV DEBIAN_FRONTEND noninteractive 
+# setup timezone
+RUN echo 'Etc/UTC' > /etc/timezone && \
+    ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+    apt-get update && \
+    apt-get install -q -y --no-install-recommends tzdata && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install packages
-RUN apt-get update && apt-get install -y \
-    locales \
-    lsb-release \
-    git \
-    wget \
-    curl \
-    software-properties-common
+# install packages
+RUN apt-get update && apt-get install -q -y --no-install-recommends \
+    dirmngr \
+    gnupg2 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Locale
-RUN locale-gen en_US.UTF-8 && \
-    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+# setup keys
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4B63CF8FDE49746E98FA01DDAD19BAB3CBF125EA
 
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8
+# setup sources.list
+RUN echo "deb http://snapshots.ros.org/foxy/final/ubuntu focal main" > /etc/apt/sources.list.d/ros2-snapshots.list
 
-# Install ROS
-RUN add-apt-repository universe && \
-    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
-    apt update && apt install -y \
+# setup environment
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+ENV ROS_DISTRO foxy
+
+# install bootstrap tools
+RUN apt-get update && apt-get install --no-install-recommends -y \
     ros-foxy-desktop \
-    python3-argcomplete \
+    build-essential \
+    git \
+    python3-colcon-common-extensions \
+    python3-colcon-mixin \
     python3-rosdep \
-    python3-colcon-common-extensions
+    python3-vcstool \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN rosdep init && rosdep update
 
