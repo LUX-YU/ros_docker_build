@@ -39,8 +39,6 @@ RUN apt-get update && apt-get install -y \
     python-vcstools \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y python-pip && pip install importlib-metadata
-
 # Configure ROS
 RUN rosdep init && rosdep update 
 RUN echo "source /opt/ros/melodic/setup.bash" >> /root/.bashrc
