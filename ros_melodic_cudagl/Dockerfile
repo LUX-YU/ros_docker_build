@@ -40,8 +40,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure ROS
-RUN rosdep init && rosdep update 
-RUN echo "source /opt/ros/melodic/setup.bash" >> /root/.bashrc
+RUN rosdep init && rosdep update
 
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}

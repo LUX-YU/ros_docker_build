@@ -12,8 +12,9 @@ RUN apt update && apt install -q -y --no-install-recommends \
     ros-foxy-dynamixel-sdk && \
     rm -rf /var/lib/apt/lists/*
 
-ENV TURTLEBOT3_MODEL buger
+ENV TURTLEBOT3_MODEL waffle
 
-RUN echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/opt/ros/foxy/share/turtlebot3_gazebo/models" >> /root/.bashrc
+COPY ./entrypoint_setup.sh /
+ENTRYPOINT ["/entrypoint_setup.sh"]
 
 CMD ["bash"]

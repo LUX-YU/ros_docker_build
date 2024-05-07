@@ -40,9 +40,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 RUN rosdep init && rosdep update
 
-# Configure ROS
-RUN echo "source /opt/ros/foxy/setup.bash" >> /root/.bashrc
-
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES \

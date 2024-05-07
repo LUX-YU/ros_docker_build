@@ -10,14 +10,14 @@ ENV ROS_DISTRO      melodic
 WORKDIR /home/ws
 
 RUN apt-get update && \
-    apt-get install -y python-catkin-tools
+    apt-get install -y python-catkin-tools && \
+    rm -rf /var/lib/apt/lists/*
 
 # build
-COPY orb_slam_2_ros /home/ws/src/orb_slam_2_ros
+COPY thirdparty/orb_slam_2_ros /home/ws/src/orb_slam_2_ros
 RUN rosdep install --from-paths src --ignore-src -r -y && \
     catkin config --extend /opt/ros/$ROS_DISTRO && \
-    catkin build && \
-    echo "source /home/ws/devel/setup.bash" >> /root/.bashrc
+    catkin build
 
 COPY ./entrypoint_setup.sh /
-ENTRYPOINT ["/entrypoint_setup.sh"]
+ENTRYPOINT ["/entrypoint_setup.sh"] 
