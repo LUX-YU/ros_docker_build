@@ -14,7 +14,7 @@ RUN apt update && apt install -q -y --no-install-recommends \
 
 ENV TURTLEBOT3_MODEL waffle
 
-COPY ./entrypoint_setup.sh /
+COPY ./nav/entrypoint_setup.sh /
 ENTRYPOINT ["/entrypoint_setup.sh"]
 
 CMD ["bash"]

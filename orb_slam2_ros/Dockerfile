@@ -19,5 +19,5 @@ RUN rosdep install --from-paths src --ignore-src -r -y && \
     catkin config --extend /opt/ros/$ROS_DISTRO && \
     catkin build
 
-COPY ./entrypoint_setup.sh /
+COPY ./orb_slam2_ros/entrypoint_setup.sh /
 ENTRYPOINT ["/entrypoint_setup.sh"] 
