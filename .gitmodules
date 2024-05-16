@@ -1,3 +1,6 @@
 [submodule "thirdparty/orb_slam_2_ros"]
 	path = thirdparty/orb_slam_2_ros
 	url = https://github.com/appliedAI-Initiative/orb_slam_2_ros.git
+[submodule "thirdparty/realsense_gazebo_plugin"]
+	path = thirdparty/realsense_gazebo_plugin
+	url = https://github.com/pal-robotics/realsense_gazebo_plugin.git
